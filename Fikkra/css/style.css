@@ -133,3 +133,34 @@ h1::after {
     background-color: #ffa500; 
     transform: scale(1.1); /* تكبير الزر قليلاً */
 }
+.service-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 800px;
+}
+
+.service-image {
+    width: 340px; 
+    height: auto;
+    margin-right: 20px; 
+    border-radius: 8px; 
+    object-fit:cover;
+}
+
+
+
+
+
+.service-description p {
+    font-size: 2em;
+    color: #555;
+    line-height: 1.6; 
+    text-align: right;
+}
