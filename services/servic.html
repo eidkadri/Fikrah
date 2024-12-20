@@ -5,6 +5,7 @@
     <title>خدماتنا</title>
     <link rel="stylesheet" href="css/style.css"/>
     <link rel="stylesheet" href="../css/all.css"/>
+    <script defer src="js/script.js"></script>
     <link rel="icon" type="image/ico" href="../images/فكرة_page-0001.ico">
 </head>
 <body>
@@ -23,6 +24,7 @@
     <div class="services">
         <img src="../images/pixma-ts7650i-ambient-usability-62921-gi-16x9_67d8f710c9314fecbfa8b884eaabec3c.webp" alt="Printer in Office" class="office-image">
         <form>
+           
             <div class="service-container">
                 <!-- File Upload -->
                 <div class="service">
@@ -55,9 +57,18 @@
                         <label><input type="radio" name="print-color" value="color"> ملون</label>
                     </div>
                 </div>
+                
+                <!-- Print on One or Both Sides -->
+                <div class="service">
+                    <h2>أوجه الطباعة</h2>
+                    <div class="options">
+                        <label><input type="radio" name="print-sides" value="one-side"> طباعة على وجه واحد</label>
+                        <label><input type="radio" name="print-sides" value="two-sides"> طباعة على الوجهين</label>
+                    </div>
+                </div>
 
                 <!-- Collection Point -->
-                <div class="service">
+                <div class="service" id="collection-point">
                     <h2>اختيار المجمع</h2>
                     <div class="options">
                         <label><input type="radio" name="collection-point" value="1"> 1</label>
@@ -69,23 +80,36 @@
                 </div>
 
                 <!-- Gate Size -->
-                <div class="service">
+                <div class="service" id="gate-size" style="display: none;">
                     <h2>اختيار بوابة</h2>
                     <div class="options">
                         <label><input type="radio" name="gate-size" value="small"> صغيرة</label>
                         <label><input type="radio" name="gate-size" value="large"> كبيرة</label>
                     </div>
                 </div>
+                <div id="file-section">
+                    <!-- سيتم إضافة الملفات الديناميكية هنا -->
+                </div>
+                <!-- Add Multiple Files -->
+                <button id="add-file" class="custom-file-upload" style="margin-top: 10px;">
+                    إضافة ملف جديد
+                </button>
+                
+                 <!-- Customer Notes -->
+                 <div class="service">
+                    <h2>إضافة ملاحظات</h2>
+                    <textarea name="customer-notes" rows="4" placeholder="أضف ملاحظاتك هنا..." style="width: 90%; max-width: 600px;"></textarea>
+                </div>
 
                 <!-- Note -->
                 <div class="service">
-                    <h2>ملاحظات</h2>
-                    <p>يرجى تحويل مبلغ على أحد الأرقام التالية:</p>
+                    
+                    <h2>يرجى تحويل مبلغ على أحد الأرقام التالية:</h2>
                     <p>123456789</p>
                     <p>987654321</p>
                     <p>135792468</p>
                 </div>
-
+    
                 <div class="service">
                     <h2>تحميل صورة وصل الدفع</h2>
                     <label for="payment-upload" class="custom-file-upload">
@@ -93,8 +117,19 @@
                     </label>
                     <input id="payment-upload" type="file" accept="image/*">
                 </div>
+                
+                
             </div>
         </form>
     </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
