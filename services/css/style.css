@@ -27,20 +27,37 @@ body {
 .list {
     list-style: none;
     float: left;
-    margin-right: 90px;
+    margin-right:  90px;
     margin-top: 20px;
 }
 
-.list li {
-    display: inline-block;
+/* nesting  */
+
+.list   li {
+    display: inline-block ;
     margin-left: 25px;
     color: #fff;
     position: relative;
 }
-
 .list li a {
     text-decoration: none;
     color: #fff;
+    
+}
+
+.list li a::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 2px; /* سماكة الخط */
+    background-color: rgb(255, 255, 255); /* لون الخط */
+    bottom: -2px; /* المسافة أسفل النص */
+    left: 0;
+    transition: 0.5s ; /* تأثير الانتقال */
+}
+
+.list li a:hover::after {
+    width: 100%; /* عرض كامل عند التمرير */
 }
 
 h1 {
