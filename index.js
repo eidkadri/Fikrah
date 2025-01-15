@@ -11,7 +11,7 @@ const printerRoutes = require('./routes/printerRoutes.js'); // استيراد م
 
 dotenv.config(); // تحميل المتغيرات البيئية
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // Middleware
 app.use(express.json());
@@ -26,7 +26,7 @@ app.use(session({
 }));
 
 // استخدام ملفات ثابتة
-app.use(express.static(path.join(__dirname, 'public'))); 
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/documents', express.static(path.join(__dirname, 'documents')));
 
@@ -57,8 +57,9 @@ app.use((req, res) => {
     res.status(404).json({ message: 'Route not found' });
 });
 
-// اتصال بـ MongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/Bookstore')
+// اتصال بـ MongoDB Atlas
+const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/Bookstore'; // استخدام Atlas أو القاعدة المحلية كبديل
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('Connected to MongoDB'))
     .catch((err) => console.error('Failed to connect to MongoDB', err));
 
