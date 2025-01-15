@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>صفحة إدارة خدمات الطباعة</title>
+  <style>
+   body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 60px 0 0 0; /* المسافة العلوية لتجنب تغطية الهيدر */
+    }
+     /* تنسيق الهيدر */
+     .header {
+      width: 100%;
+      height: 60px;
+      background-color: rgb(235, 106, 41);
+      position: fixed;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px; /* لإضافة مساحة جانبية */
+    }
+
+    .img1 {
+      height: 60px;
+    }
+
+    .list {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: 0;
+    }
+
+    .list li {
+      display: inline-block;
+      margin-left: 25px;
+      color: #fff;
+      position: relative;
+    }
+
+    .list li a {
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .list li a::after {
+      content: "";
+      position: absolute;
+      width: 0;
+      height: 2px;
+      background-color: rgb(255, 255, 255);
+      bottom: -2px;
+      left: 0;
+      transition: 0.5s;
+    }
+
+    .list li a:hover::after {
+      width: 100%;
+    }
+
+    
+    
+    h1, h2 {
+      text-align: center;
+      color: rgb(235, 106, 41);
+    }
+
+    .services {
+      display: flex;
+      flex-direction: row; /* جعل القوائم بشكل أفقي */
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 20px;
+      display: none; /* الإخفاء الابتدائي لعرض الخدمات */
+    }
+
+    .service {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      overflow: hidden;
+      padding: 10px;
+      width: 300px;
+    }
+
+    .details {
+      padding: 10px;
+    }
+
+    .details p {
+      margin: 5px 0;
+      font-size: 1.1em;
+      color: #555;
+    }
+
+    .details button {
+      background-color: rgb(235, 106, 41);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 5px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .details button:hover {
+      background-color: #ffa500;
+      transform: scale(1.1);
+    }
+
+    .details .more-info {
+      display: none; /* إخفاء التفاصيل الإضافية في البداية */
+    }
+
+    .edit-form {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .edit-form select {
+      padding: 5px;
+      font-size: 1em;
+    }
+
+    .edit-form button {
+      padding: 5px 10px;
+      font-size: 1em;
+      margin-left: 5px;
+      background-color: rgb(235, 106, 41);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // إعداد axios لإرسال ملفات تعريف الارتباط مع كل طلب
+    axios.defaults.withCredentials = true;
+
+    // التحقق من حالة تسجيل الدخول ودور المستخدم
+    axios.get('/auth/status')
+      .then(response => {
+        const data = response.data;
+        if (data.isLoggedIn && data.role === 'admin') {
+          // إظهار محتوى الصفحة إذا كان المستخدم مسؤولاً
+          document.querySelector('.services').style.display = 'flex';
+          loadServices(); // تحميل الخدمات
+        } else {
+          // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول إذا لم يكن مسؤولاً
+          window.location.href = '/user/login.html';
+        }
+      })
+      .catch(err => console.error('خطأ في التحقق من حالة تسجيل الدخول:', err));
+
+    // تحميل الخدمات عند تحميل الصفحة
+    const loadServices = () => {
+      axios.get('/printers')
+        .then(response => {
+          const services = response.data;
+          const container = document.querySelector('.services');
+          container.innerHTML = ''; // تفريغ الحاوية
+
+          if (Array.isArray(services)) { // التأكد من أن الخدمات هي مصفوفة
+            services.forEach(service => {
+              const serviceCard = document.createElement('div');
+              serviceCard.classList.add('service');
+
+              let filesList = '';
+              service.files.forEach(file => {
+                filesList += `
+                  <div>
+                    <p>اسم الملف: ${file.fileName}</p>
+                    <button onclick="downloadFile('${file.fileName}')">تحميل الملف</button>
+                    <p>وضع اللون: ${file.colorMode}</p>
+                    <p>الحجم: ${file.size}</p>
+                    <p>الوجه: ${file.face}</p>
+                    <p>الشرائح: ${file.slides}</p>
+                    <p>نوع الورق: ${file.paperType}</p>
+                    <p>النسخ: ${file.copies}</p>
+                    <p>النطاق: من ${file.rangeFrom} إلى ${file.rangeTo}</p>
+                    <p>الخدمات: ${file.services.join(', ')}</p>
+                    <p>السعر: ${file.price} $</p>
+                  </div>
+                `;
+              });
+
+              serviceCard.innerHTML = `
+                <div class="details">
+                  <p>المجمع: ${service.compound}</p>
+                  <p>البوابة: ${service.gate}</p>
+                  <p>الحالة: ${service.status}</p>
+                  <p>السعر الكلي: ${service.totalPrice} $</p>
+                  <button onclick="toggleMoreInfo('${service._id}')">المزيد من المعلومات</button>
+                  <div id="more-info-${service._id}" class="more-info">${filesList}</div>
+                  <button onclick="confirmDeleteService('${service._id}')">حذف</button>
+                  <button onclick="showEditForm('${service._id}', '${service.status}')">تعديل</button>
+                  <div class="edit-form" id="edit-form-${service._id}">
+                    <select id="status-select-${service._id}">
+                      <option value="قيد التنفيذ" ${service.status === 'قيد التنفيذ' ? 'selected' : ''}>قيد التنفيذ</option>
+                      <option value="مكتمل" ${service.status === 'مكتمل' ? 'selected' : ''}>مكتمل</option>
+                      <option value="ملغى" ${service.status === 'ملغى' ? 'selected' : ''}>ملغي</option>
+                    </select>
+                    <button onclick="updateStatus('${service._id}')">حفظ التعديلات</button>
+                    <button onclick="hideEditForm('${service._id}')">إلغاء</button>
+                  </div>
+                </div>
+              `;
+
+              container.appendChild(serviceCard);
+            });
+          } else {
+            console.error('خطأ: الخدمات ليست مصفوفة', services);
+          }
+        })
+        .catch(err => console.error('خطأ في تحميل الخدمات:', err));
+    };
+
+    // حذف خدمة
+    const confirmDeleteService = (id) => {
+      const confirmDelete = confirm('هل أنت متأكد أنك تريد حذف هذه الخدمة؟');
+      if (confirmDelete) {
+        axios.delete(`/printers/${id}`)
+          .then(() => loadServices()) // إعادة تحميل الخدمات
+          .catch(err => console.error('خطأ في حذف الخدمة:', err));
+      }
+    };
+
+    // عرض نموذج التعديل
+    const showEditForm = (id, status) => {
+      document.getElementById(`edit-form-${id}`).style.display = 'block';
+    };
+
+    // إخفاء نموذج التعديل
+    const hideEditForm = (id) => {
+      document.getElementById(`edit-form-${id}`).style.display = 'none';
+    };
+
+    // تحديث حالة الخدمة
+    const updateStatus = (id) => {
+      const status = document.getElementById(`status-select-${id}`).value;
+      const confirmUpdate = confirm('هل أنت متأكد أنك تريد تعديل حالة الخدمة؟');
+      if (confirmUpdate) {
+        axios.put(`/printers/${id}`, { status })
+          .then(() => loadServices()) // إعادة تحميل الخدمات
+          .catch(err => console.error('خطأ في تحديث حالة الخدمة:', err));
+      }
+    };
+
+    // تحميل الملف
+    const downloadFile = (fileName) => {
+      const link = document.createElement('a');
+      link.href = fileName;
+      link.download = fileName.split('/').pop();
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    // إظهار وإخفاء التفاصيل الإضافية
+    const toggleMoreInfo = (id) => {
+      const moreInfo = document.getElementById(`more-info-${id}`);
+      moreInfo.style.display = moreInfo.style.display === 'none' ? 'block' : 'none';
+    };
+  </script>
+</head>
+<body>
+    <div class="header">
+        <img class="img1" src="../images/فكرة_page-0001.jpg" alt="logo">
+        <ul class="list">
+          <li><a href="./admin-printer.html">الطلبات</a></li>
+          <li><a href="/admin">المنتجات</a></li>
+        </ul>
+      </div>
+  <h1>صفحة إدارة خدمات الطباعة</h1>
+  <div class="services">
+    <!-- سيتم تحميل الخدمات هنا ديناميكياً -->
+  </div>
+</body>
+</html>

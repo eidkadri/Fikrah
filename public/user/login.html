@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>تسجيل الدخول</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="phone">رقم الهاتف</label>
+                <input type="text" id="phone" name="phone" required>
+            </div>
+            <div class="input-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">تسجيل الدخول</button>
+        </form>
+        <p>لا تملك حسابًا؟ <a href="/user/register.html">إنشاء حساب جديد</a></p>
+        <p id="responseMessage" style="color: red; display: none;"></p>
+    </div>
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault(); // منع إعادة تحميل الصفحة
+
+            const phone = document.getElementById("phone").value;
+            const password = document.getElementById("password").value;
+            const responseMessage = document.getElementById("responseMessage");
+
+            try {
+                const response = await fetch("/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ phone, password }), // استخدام رقم الهاتف
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    responseMessage.style.color = "green";
+                    responseMessage.innerText = "تم تسجيل الدخول بنجاح.";
+                    responseMessage.style.display = "block";
+
+                    // إعادة التوجيه بعد تسجيل الدخول
+                    setTimeout(() => {
+                        window.location.href = "/"; // تغيير هذا المسار حسب مشروعك
+                    }, 2000);
+                } else {
+                    responseMessage.style.color = "red";
+                    responseMessage.innerText = data.error || "حدث خطأ أثناء تسجيل الدخول.";
+                    responseMessage.style.display = "block";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                responseMessage.style.color = "red";
+                responseMessage.innerText = "حدث خطأ في الخادم.";
+                responseMessage.style.display = "block";
+            }
+        });
+    </script>
+</body>
+</html>

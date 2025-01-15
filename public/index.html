@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar"></html>
+<head>
+    <meta charset="UTF-8">
+    <title>مكتبة فكرة</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/all.css"/>
+    <link rel="icon" type="image/ico" href="./images/فكرة_page-0001.ico"/>
+
+</head>
+<body>
+
+     
+    
+
+    <!-- //////////////////////////////////////////////////////////////////////// -->
+
+    <div class="header">
+        <img class="img1" src="images/فكرة_page-0001.jpg" alt="Logo">
+    
+        <ul class="list">
+            <li><a href="#"><i class="fas fa-home"></i></a></li>
+            <li><a href="#"><i class="fas fa-shopping-cart"></i></a></li>
+            <li><a href="./Products/products.html">المنتجات</a></li>
+            <li><a href="./services/servic.html">الخدمات</a></li>
+            <li><a href="#">فروعنا</a></li>
+            
+            
+        </ul>
+    
+        <div class="user-actions">
+            <!-- سيتم عرض اسم المستخدم أو أزرار تسجيل الدخول والخروج -->
+        </div>
+    </div>
+    
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const userActions = document.querySelector(".user-actions");
+
+    // استدعاء حالة تسجيل الدخول من الخادم
+    fetch("/auth/status")
+        .then(response => response.json())
+        .then(data => {
+            if (data.isLoggedIn) {
+                // إذا كان المستخدم مسجل الدخول
+                userActions.innerHTML = `
+                   
+                    <button onclick="logout()">تسجيل الخروج</button>
+                `;
+            } else {
+                // إذا لم يكن المستخدم مسجل الدخول
+                userActions.innerHTML = `
+                    <button onclick="location.href='/user/login.html'">تسجيل الدخول</button>
+                    <button onclick="location.href='/user/register.html'">إنشاء حساب</button>
+                `;
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching login status:", err);
+        });
+});
+
+// وظيفة تسجيل الخروج
+function logout() {
+    fetch("/auth/logout", {
+        method: "POST",
+    })
+        .then(response => {
+            if (response.ok) {
+                location.reload(); // إعادة تحميل الصفحة
+            } else {
+                alert("فشل تسجيل الخروج.");
+            }
+        })
+        .catch(err => {
+            console.error("Error logging out:", err);
+        });
+}
+
+    </script>
+    
+      <h1>الخدمات</h1>    
+      <div class="service-section">
+          <img src="images/maxify-gx7050-ambient-reception-03_1920x1080-66d4a17cd389.jfif" alt="خدمة الطباعة" class="service-image">
+          <div class="service-description">
+              
+              <p>لدينا خدمة طباعة متنوعة تشمل جميع الألوان والأحجام لتلبية احتياجاتكم</p>
+          </div>
+      </div>  
+    <h1>المنتجات</h1>
+    <div id="main-container">
+        <div id="products-container" class="products">
+            <!-- المنتجات يتم تحميلها هنا -->
+        </div>
+        <!-- الزر يتم وضعه هنا -->
+    </div>
+    
+<h1>فروعنا</h1>
+<div class="branches">
+    <div class="branch">
+        <img src="images/b232f5db-194e-48e0-aba6-2787f9ae1fe0.jpg" alt="Branch 1">
+        <div class="branch-details">
+            <h2>فرع دمشق</h2>
+            <p>عنوان الفرع: دمشق، جسر أبيض</p>
+            <p>
+                <a href="tel:+123456789"><i class="fas fa-phone"></i></a>
+                <a href="https://wa.me/123456789"><i class="fab fa-whatsapp"></i></a>
+            </p>
+        </div>
+    </div>
+    <div class="branch">
+        <img src="images/c91b662f-208b-41aa-9530-89caff7f3b6e.jpg" alt="Branch 2">
+        <div class="branch-details">
+            <h2>فرع سلطنة عمان</h2>
+            <p>عنوان الفرع: سلطنة عمان، شارع النهضة</p>
+            <p>
+                <a href="tel:+987654321"><i class="fas fa-phone"></i></a>
+                <a href="https://wa.me/987654321"><i class="fab fa-whatsapp" ></i></a>
+            </p>
+        </div>
+    </div>
+    <!-- Add more branches as needed -->
+</div>
+<script src="/jss/home.js"></script>
+
+</body>
+</html>

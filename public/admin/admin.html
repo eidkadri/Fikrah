@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>admin-product</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: rgb(235, 106, 41);
+    }
+
+    #add-product-form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      display: none; /* الإخفاء الابتدائي للنموذج */
+    }
+
+    #add-product-form input, #add-product-form button {
+      padding: 10px;
+      font-size: 1em;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    #add-product-form button {
+      background-color: rgb(235, 106, 41);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #add-product-form button:hover {
+      background-color: #ffa500;
+    }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      display: none; /* الإخفاء الابتدائي لعرض المنتجات */
+    }
+
+    .product {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .product img {
+      width: 100%;
+      height: 150px;
+      object-fit: contain;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .details {
+      padding: 10px;
+    }
+
+    .details p {
+      margin: 5px 0;
+      font-size: 1.1em;
+      color: #555;
+    }
+
+    .details button {
+      background-color: rgb(235, 106, 41);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 1em;
+      margin: 5px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .details button:hover {
+      background-color: #ffa500;
+      transform: scale(1.1);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    // إعداد axios لإرسال ملفات تعريف الارتباط مع كل طلب
+    axios.defaults.withCredentials = true;
+
+    // دالة لحذف المنتج من DOM
+    const removeProductFromDOM = (id) => {
+      const productElement = document.getElementById(`product-${id}`);
+      if (productElement) {
+        productElement.remove();
+      }
+    };
+
+    // دالة لتحديث المنتج في DOM
+    const updateProductInDOM = (id, newName, newPrice) => {
+      const productElement = document.getElementById(`product-${id}`);
+      if (productElement) {
+        const nameElement = productElement.querySelector('.details p:first-child');
+        const priceElement = productElement.querySelector('.details p:nth-child(2)');
+        nameElement.textContent = newName;
+        priceElement.textContent = `${newPrice} $`;
+      }
+    };
+
+    // دالة حذف المنتج
+    const deleteProduct = (id) => {
+      axios.delete(`/admin/products/${id}`)
+        .then(() => removeProductFromDOM(id)) // حذف المنتج من DOM
+        .catch(err => console.error('خطأ في حذف المنتج:', err));
+    };
+
+    // دالة تعديل المنتج
+    const editProduct = (id, name, price) => {
+      const newName = prompt('أدخل الاسم الجديد:', name);
+      const newPrice = prompt('أدخل السعر الجديد:', price);
+
+      if (newName && newPrice) {
+        axios.put(`/admin/products/${id}`, {
+          name: newName,
+          price: newPrice
+        })
+          .then(() => updateProductInDOM(id, newName, newPrice)) // تحديث المنتج في DOM
+          .catch(err => console.error('خطأ في تحديث المنتج:', err));
+      }
+    };
+
+    // التأكد من تحميل الصفحة بالكامل
+    window.onload = () => {
+      // التحقق من حالة تسجيل الدخول ودور المستخدم
+      axios.get('/auth/status')
+        .then(response => {
+          const data = response.data;
+          if (data.isLoggedIn && data.role === 'admin') {
+            // إظهار محتوى الصفحة إذا كان المستخدم مسؤولاً
+            document.getElementById('add-product-form').style.display = 'flex';
+            document.querySelector('.products').style.display = 'grid';
+            loadProducts(); // تحميل المنتجات
+          } else {
+            // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول إذا لم يكن مسؤولاً
+            window.location.href = '/user/login.html';
+          }
+        })
+        .catch(err => console.error('خطأ في التحقق من حالة تسجيل الدخول:', err));
+    };
+
+    // تحميل المنتجات عند تحميل الصفحة
+    const loadProducts = () => {
+      axios.get('/admin/products')
+        .then(response => {
+          const products = response.data;
+          const container = document.querySelector('.products');
+          container.innerHTML = ''; // تفريغ الحاوية
+
+          if (Array.isArray(products)) { // التأكد من أن المنتجات هي مصفوفة
+            products.forEach(product => {
+              const productCard = document.createElement('div');
+              productCard.classList.add('product');
+              productCard.id = `product-${product._id}`;
+
+              productCard.innerHTML = `
+                <img src="${product.image}" alt="${product.name}">
+                <div class="details">
+                  <p>${product.name}</p>
+                  <p>${product.price} $</p>
+                  <button onclick="deleteProduct('${product._id}')">حذف</button>
+                  <button onclick="editProduct('${product._id}', '${product.name}', ${product.price})">تعديل</button>
+                </div>
+              `;
+
+              container.appendChild(productCard);
+            });
+          } else {
+            console.error('خطأ: المنتجات ليست مصفوفة', products);
+          }
+        })
+        .catch(err => console.error('خطأ في تحميل المنتجات:', err));
+    };
+
+    // إضافة منتج جديد
+    const addProductToDOM = (product) => {
+      const container = document.querySelector('.products');
+      const productCard = document.createElement('div');
+      productCard.classList.add('product');
+      productCard.id = `product-${product._id}`;
+
+      productCard.innerHTML = `
+        <img src="${product.image}" alt="${product.name}">
+        <div class="details">
+          <p>${product.name}</p>
+          <p>${product.price} $</p>
+          <button onclick="deleteProduct('${product._id}')">حذف</button>
+          <button onclick="editProduct('${product._id}', '${product.name}', ${product.price})">تعديل</button>
+        </div>
+      `;
+
+      container.appendChild(productCard);
+    };
+
+    const form = document.getElementById('add-product-form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      axios.post('/admin/products', formData)
+        .then(response => {
+          form.reset();
+          addProductToDOM(response.data); // إضافة المنتج الجديد إلى DOM
+        })
+        .catch(err => console.error('خطأ في إضافة المنتج:', err));
+    });
+  </script>
+</head>
+<body>
+  <h1>صفحة الإدارة</h1>
+  <form id="add-product-form" enctype="multipart/form-data">
+    <input type="text" name="name" placeholder="اسم المنتج" required>
+    <input type="number" name="price" placeholder="السعر" required>
+    <input type="file" name="image" required>
+    <button type="submit">إضافة المنتج</button>
+  </form>
+
+  <h2>جميع المنتجات</h2>
+  <div class="products" id="products-container">
+    <!-- سيتم تحميل المنتجات هنا ديناميكياً -->
+  </div>
+</body>
+</html>
