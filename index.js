@@ -19,11 +19,12 @@ app.use(express.urlencoded({ extended: true }));
 
 // إعداد الجلسات
 app.use(session({
-    secret: 'your_secret_key', // استبدل المفتاح السري بمفتاح قوي
+    secret: process.env.SESSION_SECRET || 'your_secret_key', // استبدل المفتاح السري بمفتاح قوي
     resave: false,
     saveUninitialized: false,
     cookie: { secure: false } // إذا كنت تستخدم HTTPS، غيّرها إلى true
 }));
+
 
 // استخدام ملفات ثابتة
 app.use(express.static(path.join(__dirname, 'public')));
