@@ -3,11 +3,11 @@ const mongoose = require('mongoose');
 const path = require('path');
 const dotenv = require("dotenv");
 const session = require('express-session');
-const productRoutes = require('/routes/userProductRoutes.js');
-const adminProductRoutes = require('/routes/adminProductRoutes.js');
-const authRoutes = require('/middlewares/auth.js');
-const isAdmin = require('/middlewares/admin.js'); // استيراد Middleware للتحقق من دور المسؤول
-const printerRoutes = require('/routes/printerRoutes.js'); // استيراد مسارات خدمات الطباعة
+const productRoutes = require('./routes/userProductRoutes.js');
+const adminProductRoutes = require('./routes/adminProductRoutes.js');
+const authRoutes = require('./middlewares/auth.js');
+const isAdmin = require('./middlewares/admin.js'); // استيراد Middleware للتحقق من دور المسؤول
+const printerRoutes = require('./routes/printerRoutes.js'); // استيراد مسارات خدمات الطباعة
 
 dotenv.config(); // تحميل المتغيرات البيئية
 const app = express();
